@@ -10,12 +10,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/darlenya/kronos-step-gzip.git"
+    "url": "git+https://github.com/Kronos-Integration/kronos-step-gzip.git"
   },
   "bugs": {
-    "url": "https://github.com/darlenya/kronos-step-gzip/issues"
+    "url": "git+https://github.com/Kronos-Integration/kronos-step-gzip/issues"
   },
-  "homepage": "https://github.com/darlenya/kronos-step-gzip#readme",
+  "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "engines": {
     "iojs": "2.0.0"
   },
@@ -37,6 +37,6 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "chokidar": "^1.0.5",
-    "kronos-step": "git+ssh://donkey@mfelten.de/Groups/donkey/git/kronos-step.git"
+    "kronos-step": "^1.1.0"
   }
 }
