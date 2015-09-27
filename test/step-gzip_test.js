@@ -25,15 +25,15 @@ describe('zip and unzip files', function () {
 	/**
 	 * Clears the test directory. This is the monitored directoy where the files will be created
 	 */
-	// beforeEach(function () {
-	// 	// Delete all the the 'volatile' directory
-	// 	try {
-	// 		rimraf.sync(volatileDir);
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 	}
-	// 	fs.mkdirSync(volatileDir);
-	// });
+	beforeEach(function () {
+		// Delete all the the 'volatile' directory
+		try {
+			rimraf.sync(volatileDir);
+		} catch (err) {
+			console.log(err);
+		}
+		fs.mkdirSync(volatileDir);
+	});
 
 	/**
 	 * Reads a file, get zipped by the step and then comapred against its reference.
@@ -83,7 +83,6 @@ describe('zip and unzip files', function () {
 						assert.ok(false, "The file does not exists");
 						done();
 					}
-
 				});
 
 			}
