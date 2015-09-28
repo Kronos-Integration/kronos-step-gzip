@@ -26,9 +26,9 @@
     "chai": "3.2.0",
     "file-compare": "0.0.2",
     "istanbul-harmony": "0.3.16",
-    "mocha": "^2.3.0",
-    "rimraf": "^2.4.3",
-    "semantic-release": "4.3.5"
+    "mocha": "2.3.3",
+    "rimraf": "2.4.3",
+    "semantic-release": "^6.0.1"
   },
   "author": {
     "name": "Torsten Link",
@@ -36,7 +36,7 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "chokidar": "^1.0.5",
-    "kronos-step": "^1.1.0"
+    "chokidar": "1.1.0",
+    "kronos-step": "1.1.0"
   }
 }
