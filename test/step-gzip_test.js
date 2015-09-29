@@ -92,7 +92,6 @@ describe('zip and unzip files', function () {
 		outEndPoint.outActiveIterator = generatorFunction();
 		outEndPoint.outActiveIterator.next();
 
-
 		let it = inEndPoint.getInPassiveIterator()();
 		it.next();
 
