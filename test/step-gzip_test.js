@@ -12,12 +12,15 @@ const should = chai.should();
 
 const fs = require('fs');
 const path = require("path");
+const events = require('events');
 const rimraf = require('rimraf');
 
 const fixturesDir = path.join(__dirname, 'fixtures');
 const volatileDir = path.join(__dirname, 'fixtures', 'volatile');
+const manager = Object.create(new events.EventEmitter(), {});
 
-const gzipStep = require('../lib/step-gzip');
+const GzipStep = require('../lib/step-gzip');
+const Endpoint = require('kronos-step');
 const messageFactory = require('kronos-step').message;
 
 
@@ -50,13 +53,24 @@ describe('zip and unzip files', function () {
 		// Currently the error messges will not be checked.
 		let errors = [];
 
-		let step1 = gzipStep({}, {}, {
-			"name": "myStep"
+		let step1 = new GzipStep(manager, undefined, "myStep", GzipStep.configuration);
+
+		let inEndPoint = step1.endpoints.inZip;
+		let outEndPoint = step1.endpoints.outZip;
+
+		// This endpoint is the IN endpoint of the next step.
+		// It will be connected with the OUT endpoint of the Adpater
+		let receiveEndpoint = Endpoint.createEndpoint("testEndpointIn", {
+			"in": true,
+			"passive": true
 		});
 
-		let inEndPoint = step1.getEndpoint('inZip');
-		let outEndPoint = step1.getEndpoint('outZip');
-
+		// This endpoint is the OUT endpoint of the previous step.
+		// It will be connected with the OUT endpoint of the Adpater
+		let sendEndpoint = Endpoint.createEndpoint("testEndpointOut", {
+			"out": true,
+			"active": true
+		});
 
 		// This generator emulates the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
@@ -88,19 +102,21 @@ describe('zip and unzip files', function () {
 			}
 		};
 
-		outEndPoint.connectedEndpoint = generatorFunction;
-		outEndPoint.outActiveIterator = generatorFunction();
-		outEndPoint.outActiveIterator.next();
 
-		let it = inEndPoint.getInPassiveIterator()();
-		it.next();
+		receiveEndpoint.setPassiveGenerator(generatorFunction);
+		outEndPoint.connect(receiveEndpoint);
+		inEndPoint.connect(sendEndpoint);
+
+		step1.start();
+
 
 		let msg = messageFactory({
 			"file_name": "anyFile.txt"
 		});
 
 		msg.payload = fs.createReadStream(inFile);
-		it.next(msg);
+
+		sendEndpoint.send(msg);
 	});
 
 
@@ -119,12 +135,24 @@ describe('zip and unzip files', function () {
 		// Currently the error messges will not be checked.
 		let errors = [];
 
-		let step1 = gzipStep({}, {}, {
-			"name": "myStep"
+		let step1 = new GzipStep(manager, undefined, "myStep", GzipStep.configuration);
+
+		let inEndPoint = step1.endpoints.inUnZip;
+		let outEndPoint = step1.endpoints.outUnZip;
+
+		// This endpoint is the IN endpoint of the next step.
+		// It will be connected with the OUT endpoint of the Adpater
+		let receiveEndpoint = Endpoint.createEndpoint("testEndpointIn", {
+			"in": true,
+			"passive": true
 		});
 
-		let inEndPoint = step1.getEndpoint('inUnZip');
-		let outEndPoint = step1.getEndpoint('outUnZip');
+		// This endpoint is the OUT endpoint of the previous step.
+		// It will be connected with the OUT endpoint of the Adpater
+		let sendEndpoint = Endpoint.createEndpoint("testEndpointOut", {
+			"out": true,
+			"active": true
+		});
 
 
 		// This generator emulates the IN endpoint of the next step.
@@ -157,21 +185,21 @@ describe('zip and unzip files', function () {
 
 			}
 		};
+		receiveEndpoint.setPassiveGenerator(generatorFunction);
+		outEndPoint.connect(receiveEndpoint);
+		inEndPoint.connect(sendEndpoint);
 
-		outEndPoint.connectedEndpoint = generatorFunction;
-		outEndPoint.outActiveIterator = generatorFunction();
-		outEndPoint.outActiveIterator.next();
+		step1.start();
 
-
-		let it = inEndPoint.getInPassiveIterator()();
-		it.next();
 
 		let msg = messageFactory({
 			"file_name": "anyFile.txt"
 		});
 
 		msg.payload = fs.createReadStream(inFile);
-		it.next(msg);
+
+		sendEndpoint.send(msg);
+
 	});
 
 
