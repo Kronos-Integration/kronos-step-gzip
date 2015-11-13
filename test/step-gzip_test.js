@@ -3,8 +3,6 @@
 
 "use strict";
 
-const comperator = require('file-compare');
-
 const chai = require('chai');
 const assert = chai.assert;
 const expect = chai.expect;
@@ -12,16 +10,24 @@ const should = chai.should();
 
 const fs = require('fs');
 const path = require("path");
-const events = require('events');
 const rimraf = require('rimraf');
 
 const fixturesDir = path.join(__dirname, 'fixtures');
 const volatileDir = path.join(__dirname, 'fixtures', 'volatile');
-const manager = Object.create(new events.EventEmitter(), {});
+const comperator = require('file-compare');
 
-const GzipStep = require('../lib/step-gzip');
-const Endpoint = require('kronos-step');
-const messageFactory = require('kronos-step').message;
+const step = require('kronos-step');
+const testStep = require('kronos-test-step');
+const stepPassThrough = require('../index.js');
+const messageFactory = require('kronos-message');
+
+const GzipStep = require('../index');
+
+// ---------------------------
+// Create a mock manager
+// ---------------------------
+const manager = testStep.managerMock;
+GzipStep.registerWithManager(manager);
 
 
 describe('zip and unzip files', function () {
@@ -53,21 +59,25 @@ describe('zip and unzip files', function () {
 		// Currently the error messges will not be checked.
 		let errors = [];
 
-		let step1 = new GzipStep(manager, undefined, "myStep", GzipStep.configuration);
+		let step1 = manager.getStepInstance({
+			"type": "kronos-step-gzip",
+			"name": "myGzipStep"
+		});
+
 
 		let inEndPoint = step1.endpoints.inZip;
 		let outEndPoint = step1.endpoints.outZip;
 
 		// This endpoint is the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let receiveEndpoint = Endpoint.createEndpoint("testEndpointIn", {
+		let receiveEndpoint = step.createEndpoint("testEndpointIn", {
 			"in": true,
 			"passive": true
 		});
 
 		// This endpoint is the OUT endpoint of the previous step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let sendEndpoint = Endpoint.createEndpoint("testEndpointOut", {
+		let sendEndpoint = step.createEndpoint("testEndpointOut", {
 			"out": true,
 			"active": true
 		});
@@ -107,16 +117,17 @@ describe('zip and unzip files', function () {
 		outEndPoint.connect(receiveEndpoint);
 		inEndPoint.connect(sendEndpoint);
 
-		step1.start();
-
-
 		let msg = messageFactory({
 			"file_name": "anyFile.txt"
 		});
-
 		msg.payload = fs.createReadStream(inFile);
 
-		sendEndpoint.send(msg);
+		step1.start().then(function (step) {
+			sendEndpoint.send(msg);
+		}, function (error) {
+			done(error); // 'uh oh: something bad happened’
+		});
+
 	});
 
 
@@ -135,21 +146,24 @@ describe('zip and unzip files', function () {
 		// Currently the error messges will not be checked.
 		let errors = [];
 
-		let step1 = new GzipStep(manager, undefined, "myStep", GzipStep.configuration);
+		let step1 = manager.getStepInstance({
+			"type": "kronos-step-gzip",
+			"name": "myStep"
+		});
 
 		let inEndPoint = step1.endpoints.inUnZip;
 		let outEndPoint = step1.endpoints.outUnZip;
 
 		// This endpoint is the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let receiveEndpoint = Endpoint.createEndpoint("testEndpointIn", {
+		let receiveEndpoint = step.createEndpoint("testEndpointIn", {
 			"in": true,
 			"passive": true
 		});
 
 		// This endpoint is the OUT endpoint of the previous step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let sendEndpoint = Endpoint.createEndpoint("testEndpointOut", {
+		let sendEndpoint = step.createEndpoint("testEndpointOut", {
 			"out": true,
 			"active": true
 		});
@@ -189,16 +203,17 @@ describe('zip and unzip files', function () {
 		outEndPoint.connect(receiveEndpoint);
 		inEndPoint.connect(sendEndpoint);
 
-		step1.start();
-
-
 		let msg = messageFactory({
 			"file_name": "anyFile.txt"
 		});
 
 		msg.payload = fs.createReadStream(inFile);
 
-		sendEndpoint.send(msg);
+		step1.start().then(function (step) {
+			sendEndpoint.send(msg);
+		}, function (error) {
+			done(error); // 'uh oh: something bad happened’
+		});
 
 	});
 
