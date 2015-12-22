@@ -29,7 +29,7 @@
     "file-compare": "0.0.2",
     "istanbul": "^0.4.0",
     "kronos-message": "^1.0.1",
-    "kronos-test-step": "^2.0.0",
+    "kronos-test-step": "^2.7.0",
     "mocha": "2.3.4",
     "rimraf": "2.4.4",
     "semantic-release": "4.3.5"
