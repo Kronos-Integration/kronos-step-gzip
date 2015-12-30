@@ -21,7 +21,7 @@
     "debug": false
   },
   "dependencies": {
-    "chokidar": "1.4.1",
+    "chokidar": "1.4.2",
     "kronos-step": "2.12.1"
   },
   "devDependencies": {
