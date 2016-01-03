@@ -71,49 +71,43 @@ describe('zip and unzip files', function () {
 		// This endpoint is the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
 		let receiveEndpoint = step.createEndpoint("testEndpointIn", {
-			"in": true,
-			"passive": true
+			"in": true
 		});
 
 		// This endpoint is the OUT endpoint of the previous step.
 		// It will be connected with the OUT endpoint of the Adpater
 		let sendEndpoint = step.createEndpoint("testEndpointOut", {
-			"out": true,
-			"active": true
+			"out": true
 		});
 
 		// This generator emulates the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let generatorFunction = function* () {
-			while (true) {
-				const message = yield;
+		let receiveFunction = function (message) {
 
-				// get the GZIP stream and write it to the file
-				let writeStream = fs.createWriteStream(outFile);
+			// get the GZIP stream and write it to the file
+			let writeStream = fs.createWriteStream(outFile);
 
-				// after the file was written we need to compare it
-				message.payload.pipe(writeStream).on('finish', function () {
+			// after the file was written we need to compare it
+			message.payload.pipe(writeStream).on('finish', function () {
 
-					// check that the file exists
-					let stats = fs.lstatSync(outFile);
+				// check that the file exists
+				let stats = fs.lstatSync(outFile);
 
-					// Is it a directory?
-					if (stats.isFile()) {
-						comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
-							assert.ok(copied, "The created zip file is not the same as expected");
-							done();
-						});
-					} else {
-						assert.ok(false, "The file does not exists");
+				// Is it a directory?
+				if (stats.isFile()) {
+					comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
+						assert.ok(copied, "The created zip file is not the same as expected");
 						done();
-					}
-				});
-
-			}
+					});
+				} else {
+					assert.ok(false, "The file does not exists");
+					done();
+				}
+			});
 		};
 
 
-		receiveEndpoint.setPassiveGenerator(generatorFunction);
+		receiveEndpoint.receive = receiveFunction;
 		outEndPoint.connect(receiveEndpoint);
 		inEndPoint.connect(sendEndpoint);
 
@@ -171,35 +165,31 @@ describe('zip and unzip files', function () {
 
 		// This generator emulates the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let generatorFunction = function* () {
-			while (true) {
-				const message = yield;
+		let receiveFunction = function (message) {
 
-				// get the GZIP stream and write it to the file
-				let writeStream = fs.createWriteStream(outFile);
+			// get the GZIP stream and write it to the file
+			let writeStream = fs.createWriteStream(outFile);
 
-				// after the file was written we need to compare it
-				message.payload.pipe(writeStream).on('finish', function () {
+			// after the file was written we need to compare it
+			message.payload.pipe(writeStream).on('finish', function () {
 
-					// check that the file exists
-					let stats = fs.lstatSync(outFile);
+				// check that the file exists
+				let stats = fs.lstatSync(outFile);
 
-					// Is it a directory?
-					if (stats.isFile()) {
-						setTimeout(comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
-							assert.ok(copied, "The created unziped file is not the same as expected");
-							done();
-						}), 1000);
-
-					} else {
-						assert.ok(false, "The file does not exists");
+				// Is it a directory?
+				if (stats.isFile()) {
+					setTimeout(comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
+						assert.ok(copied, "The created unziped file is not the same as expected");
 						done();
-					}
-				});
+					}), 1000);
 
-			}
+				} else {
+					assert.ok(false, "The file does not exists");
+					done();
+				}
+			});
 		};
-		receiveEndpoint.setPassiveGenerator(generatorFunction);
+		receiveEndpoint.receive = receiveFunction;
 		outEndPoint.connect(receiveEndpoint);
 		inEndPoint.connect(sendEndpoint);
 
