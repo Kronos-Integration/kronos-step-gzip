@@ -19,7 +19,6 @@ const comperator = require('file-compare');
 const step = require('kronos-step');
 const testStep = require('kronos-test-step');
 const stepPassThrough = require('../index.js');
-const messageFactory = require('kronos-message');
 
 const GzipStep = require('../index');
 
@@ -111,9 +110,11 @@ describe('zip and unzip files', function () {
 		outEndPoint.connect(receiveEndpoint);
 		inEndPoint.connect(sendEndpoint);
 
-		let msg = messageFactory({
-			"file_name": "anyFile.txt"
-		});
+		let msg = {
+			"info": {
+				"file_name": "anyFile.txt"
+			}
+		};
 		msg.payload = fs.createReadStream(inFile);
 
 		step1.start().then(function (step) {
@@ -193,9 +194,11 @@ describe('zip and unzip files', function () {
 		outEndPoint.connect(receiveEndpoint);
 		inEndPoint.connect(sendEndpoint);
 
-		let msg = messageFactory({
-			"file_name": "anyFile.txt"
-		});
+		let msg = {
+			"info": {
+				"file_name": "anyFile.txt"
+			}
+		};
 
 		msg.payload = fs.createReadStream(inFile);
 
