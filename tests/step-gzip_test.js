@@ -114,7 +114,7 @@ describe('zip and unzip files', function () {
 		msg.payload = fs.createReadStream(inFile);
 
 		step1.start().then(step =>
-			sendEndpoint.send(msg),
+			sendEndpoint.receive(msg),
 			done // 'uh oh: something bad happened’
 		).catch(done);
 	});
