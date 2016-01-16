@@ -69,15 +69,11 @@ describe('zip and unzip files', function () {
 
 		// This endpoint is the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let receiveEndpoint = step.createEndpoint("testEndpointIn", {
-			"in": true
-		});
+		let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
 
 		// This endpoint is the OUT endpoint of the previous step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let sendEndpoint = step.createEndpoint("testEndpointOut", {
-			"out": true
-		});
+		let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
 
 		// This generator emulates the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
@@ -107,8 +103,8 @@ describe('zip and unzip files', function () {
 
 
 		receiveEndpoint.receive = receiveFunction;
-		outEndPoint.connect(receiveEndpoint);
-		inEndPoint.connect(sendEndpoint);
+		outEndPoint.connected = receiveEndpoint;
+		sendEndpoint.connected = inEndPoint;
 
 		let msg = {
 			"info": {
@@ -117,12 +113,10 @@ describe('zip and unzip files', function () {
 		};
 		msg.payload = fs.createReadStream(inFile);
 
-		step1.start().then(function (step) {
-			sendEndpoint.send(msg);
-		}, function (error) {
-			done(error); // 'uh oh: something bad happened’
-		});
-
+		step1.start().then(step =>
+			sendEndpoint.send(msg),
+			done // 'uh oh: something bad happened’
+		).catch(done);
 	});
 
 
@@ -151,17 +145,11 @@ describe('zip and unzip files', function () {
 
 		// This endpoint is the IN endpoint of the next step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let receiveEndpoint = step.createEndpoint("testEndpointIn", {
-			"in": true,
-			"passive": true
-		});
+		let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
 
 		// This endpoint is the OUT endpoint of the previous step.
 		// It will be connected with the OUT endpoint of the Adpater
-		let sendEndpoint = step.createEndpoint("testEndpointOut", {
-			"out": true,
-			"active": true
-		});
+		let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
 
 
 		// This generator emulates the IN endpoint of the next step.
@@ -190,9 +178,10 @@ describe('zip and unzip files', function () {
 				}
 			});
 		};
+
 		receiveEndpoint.receive = receiveFunction;
-		outEndPoint.connect(receiveEndpoint);
-		inEndPoint.connect(sendEndpoint);
+		outEndPoint.connected = receiveEndpoint;
+		sendEndpoint.connected = inEndPoint;
 
 		let msg = {
 			"info": {
@@ -202,13 +191,11 @@ describe('zip and unzip files', function () {
 
 		msg.payload = fs.createReadStream(inFile);
 
-		step1.start().then(function (step) {
-			sendEndpoint.send(msg);
-		}, function (error) {
-			done(error); // 'uh oh: something bad happened’
-		});
+		step1.start().then(step =>
+			sendEndpoint.receive(msg),
+			done // 'uh oh: something bad happened’
+		).catch(done);
 
 	});
-
 
 });
