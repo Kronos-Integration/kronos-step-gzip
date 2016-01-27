@@ -26,7 +26,7 @@
     "file-compare": "0.0.2",
     "istanbul": "^0.4.2",
     "kronos-test-step": "^2.10.0",
-    "mocha": "2.4.1",
+    "mocha": "2.4.2",
     "rimraf": "^2.5.1",
     "semantic-release": "4.3.5"
   },
