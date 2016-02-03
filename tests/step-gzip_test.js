@@ -18,15 +18,20 @@ const comperator = require('file-compare');
 
 const step = require('kronos-step');
 const testStep = require('kronos-test-step');
-const stepPassThrough = require('../index.js');
+const serviceManager = require('kronos-service-manager');
 
 const GzipStep = require('../index');
 
 // ---------------------------
 // Create a mock manager
 // ---------------------------
-const manager = testStep.managerMock;
-GzipStep.registerWithManager(manager);
+const managerPromise = serviceManager.manager().then(manager =>
+	Promise.all([
+		GzipStep.registerWithManager(manager)
+	]).then(() =>
+		Promise.resolve(manager)
+	));
+
 
 
 describe('zip and unzip files', function () {
@@ -46,156 +51,167 @@ describe('zip and unzip files', function () {
 	/**
 	 * Reads a file, get zipped by the step and then comapred against its reference.
 	 */
-	it('zip a stream', function (done) {
+	it('zip a stream', function () {
 		// Set the timeout for this test
 		this.timeout(4000);
 
-		let inFile = path.join(fixturesDir, 'normal.txt');
-		let outFileRef = path.join(fixturesDir, 'normal.txt.gz');
-		let outFile = path.join(volatileDir, 'testFile.txt.gz');
+		return managerPromise.then(manager => {
+			let inFile = path.join(fixturesDir, 'normal.txt');
+			let outFileRef = path.join(fixturesDir, 'normal.txt.gz');
+			let outFile = path.join(volatileDir, 'testFile.txt.gz');
 
-		// Stores the error messages
-		// Currently the error messges will not be checked.
-		let errors = [];
+			// Stores the error messages
+			// Currently the error messges will not be checked.
+			let errors = [];
 
-		let step1 = manager.getStepInstance({
-			"type": "kronos-step-gzip",
-			"name": "myGzipStep"
-		});
+			let step1 = manager.createStepInstanceFromConfig({
+				"type": "kronos-step-gzip",
+				"name": "myGzipStep"
+			}, manager);
 
 
-		let inEndPoint = step1.endpoints.inZip;
-		let outEndPoint = step1.endpoints.outZip;
+			let inEndPoint = step1.endpoints.inZip;
+			let outEndPoint = step1.endpoints.outZip;
 
-		// This endpoint is the IN endpoint of the next step.
-		// It will be connected with the OUT endpoint of the Adpater
-		let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
+			// This endpoint is the IN endpoint of the next step.
+			// It will be connected with the OUT endpoint of the Adpater
+			let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
 
-		// This endpoint is the OUT endpoint of the previous step.
-		// It will be connected with the OUT endpoint of the Adpater
-		let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
+			// This endpoint is the OUT endpoint of the previous step.
+			// It will be connected with the OUT endpoint of the Adpater
+			let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
 
-		// This generator emulates the IN endpoint of the next step.
-		// It will be connected with the OUT endpoint of the Adpater
-		let receiveFunction = function (message) {
 
-			// get the GZIP stream and write it to the file
-			let writeStream = fs.createWriteStream(outFile);
+			// This generator emulates the IN endpoint of the next step.
+			// It will be connected with the OUT endpoint of the Adpater
+			let receiveFunction = function (message) {
 
-			// after the file was written we need to compare it
-			message.payload.pipe(writeStream).on('finish', function () {
+				// get the GZIP stream and write it to the file
+				let writeStream = fs.createWriteStream(outFile);
 
-				// check that the file exists
-				let stats = fs.lstatSync(outFile);
+				return new Promise(function (resolve, reject) {
+					// after the file was written we need to compare it
+					message.payload.pipe(writeStream).on('finish', function () {
 
-				// Is it a directory?
-				if (stats.isFile()) {
-					comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
-						assert.ok(copied, "The created zip file is not the same as expected");
-						done();
+						// check that the file exists
+						let stats = fs.lstatSync(outFile);
+
+						// Is it a file?
+						if (stats.isFile()) {
+							comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
+								assert.ok(copied, "The created zip file is not the same as expected");
+								resolve("OK");
+							});
+						} else {
+							assert.ok(false, "The file does not exists");
+							reject("Error");
+						}
 					});
-				} else {
-					assert.ok(false, "The file does not exists");
-					done();
+				});
+
+			};
+
+
+			receiveEndpoint.receive = receiveFunction;
+			outEndPoint.connected = receiveEndpoint;
+			sendEndpoint.connected = inEndPoint;
+
+			let msg = {
+				"info": {
+					"file_name": "anyFile.txt"
 				}
+			};
+			msg.payload = fs.createReadStream(inFile);
+
+			return step1.start().then(step => {
+				return sendEndpoint.receive(msg);
 			});
-		};
 
-
-		receiveEndpoint.receive = receiveFunction;
-		outEndPoint.connected = receiveEndpoint;
-		sendEndpoint.connected = inEndPoint;
-
-		let msg = {
-			"info": {
-				"file_name": "anyFile.txt"
-			}
-		};
-		msg.payload = fs.createReadStream(inFile);
-
-		step1.start().then(step =>
-			sendEndpoint.receive(msg),
-			done // 'uh oh: something bad happened’
-		).catch(done);
+		});
 	});
 
 
 	/**
 	 * Reads a zipped file, get unzipped by the step and then comapred against its reference.
 	 */
-	it('unzip a stream', function (done) {
+	it('unzip a stream', function () {
 		// Set the timeout for this test
 		this.timeout(4000);
 
-		let inFile = path.join(fixturesDir, 'normal.txt.gz');
-		let outFileRef = path.join(fixturesDir, 'normal.txt');
-		let outFile = path.join(volatileDir, 'testFile.txt');
+		return managerPromise.then(manager => {
+			let inFile = path.join(fixturesDir, 'normal.txt.gz');
+			let outFileRef = path.join(fixturesDir, 'normal.txt');
+			let outFile = path.join(volatileDir, 'testFile.txt');
 
-		// Stores the error messages
-		// Currently the error messges will not be checked.
-		let errors = [];
+			// Stores the error messages
+			// Currently the error messges will not be checked.
+			let errors = [];
 
-		let step1 = manager.getStepInstance({
-			"type": "kronos-step-gzip",
-			"name": "myStep"
+			let step1 = manager.createStepInstanceFromConfig({
+				"type": "kronos-step-gzip",
+				"name": "myStep"
+			}, manager);
+
+			let inEndPoint = step1.endpoints.inUnZip;
+			let outEndPoint = step1.endpoints.outUnZip;
+
+			// This endpoint is the IN endpoint of the next step.
+			// It will be connected with the OUT endpoint of the Adpater
+			let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
+
+			// This endpoint is the OUT endpoint of the previous step.
+			// It will be connected with the OUT endpoint of the Adpater
+			let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
+
+
+			// This generator emulates the IN endpoint of the next step.
+			// It will be connected with the OUT endpoint of the Adpater
+			let receiveFunction = function (message) {
+
+				// get the GZIP stream and write it to the file
+				let writeStream = fs.createWriteStream(outFile);
+
+				return new Promise(function (resolve, reject) {
+					// after the file was written we need to compare it
+					message.payload.pipe(writeStream).on('finish', function () {
+
+						// check that the file exists
+						let stats = fs.lstatSync(outFile);
+
+						// Is it a directory?
+						if (stats.isFile()) {
+							setTimeout(comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
+								assert.ok(copied, "The created unziped file is not the same as expected");
+								resolve("OK");
+							}), 1000);
+
+						} else {
+							assert.ok(false, "The file does not exists");
+							reject("Error");
+						}
+					});
+				});
+
+			};
+
+
+			receiveEndpoint.receive = receiveFunction;
+			outEndPoint.connected = receiveEndpoint;
+			sendEndpoint.connected = inEndPoint;
+
+			let msg = {
+				"info": {
+					"file_name": "anyFile.txt"
+				}
+			};
+			msg.payload = fs.createReadStream(inFile);
+
+			return step1.start().then(step => {
+
+				return sendEndpoint.receive(msg);
+			});
+
 		});
 
-		let inEndPoint = step1.endpoints.inUnZip;
-		let outEndPoint = step1.endpoints.outUnZip;
-
-		// This endpoint is the IN endpoint of the next step.
-		// It will be connected with the OUT endpoint of the Adpater
-		let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
-
-		// This endpoint is the OUT endpoint of the previous step.
-		// It will be connected with the OUT endpoint of the Adpater
-		let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
-
-
-		// This generator emulates the IN endpoint of the next step.
-		// It will be connected with the OUT endpoint of the Adpater
-		let receiveFunction = function (message) {
-
-			// get the GZIP stream and write it to the file
-			let writeStream = fs.createWriteStream(outFile);
-
-			// after the file was written we need to compare it
-			message.payload.pipe(writeStream).on('finish', function () {
-
-				// check that the file exists
-				let stats = fs.lstatSync(outFile);
-
-				// Is it a directory?
-				if (stats.isFile()) {
-					setTimeout(comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
-						assert.ok(copied, "The created unziped file is not the same as expected");
-						done();
-					}), 1000);
-
-				} else {
-					assert.ok(false, "The file does not exists");
-					done();
-				}
-			});
-		};
-
-		receiveEndpoint.receive = receiveFunction;
-		outEndPoint.connected = receiveEndpoint;
-		sendEndpoint.connected = inEndPoint;
-
-		let msg = {
-			"info": {
-				"file_name": "anyFile.txt"
-			}
-		};
-
-		msg.payload = fs.createReadStream(inFile);
-
-		step1.start().then(step =>
-			sendEndpoint.receive(msg),
-			done // 'uh oh: something bad happened’
-		).catch(done);
-
 	});
-
 });

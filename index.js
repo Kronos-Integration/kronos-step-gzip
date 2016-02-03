@@ -5,6 +5,4 @@ const Step = require('./lib/step-gzip');
 
 module.exports.Step = Step;
 
-exports.registerWithManager = function (manager) {
-	manager.registerStep(Step);
-};
+exports.registerWithManager = manager => manager.registerStep(Step);
