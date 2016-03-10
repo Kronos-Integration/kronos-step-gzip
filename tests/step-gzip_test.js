@@ -17,6 +17,7 @@ const volatileDir = path.join(__dirname, 'fixtures', 'volatile');
 const comperator = require('file-compare');
 
 const step = require('kronos-step');
+const endpoint = require('kronos-endpoint');
 const testStep = require('kronos-test-step');
 const serviceManager = require('kronos-service-manager');
 
@@ -75,11 +76,11 @@ describe('zip and unzip files', function () {
 
 			// This endpoint is the IN endpoint of the next step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
+			let receiveEndpoint = new endpoint.ReceiveEndpoint("testEndpointIn");
 
 			// This endpoint is the OUT endpoint of the previous step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
+			let sendEndpoint = new endpoint.SendEndpoint("testEndpointOut");
 
 
 			// This generator emulates the IN endpoint of the next step.
@@ -157,11 +158,11 @@ describe('zip and unzip files', function () {
 
 			// This endpoint is the IN endpoint of the next step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let receiveEndpoint = new step.endpoint.ReceiveEndpoint("testEndpointIn");
+			let receiveEndpoint = new endpoint.ReceiveEndpoint("testEndpointIn");
 
 			// This endpoint is the OUT endpoint of the previous step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let sendEndpoint = new step.endpoint.SendEndpoint("testEndpointOut");
+			let sendEndpoint = new endpoint.SendEndpoint("testEndpointOut");
 
 
 			// This generator emulates the IN endpoint of the next step.
