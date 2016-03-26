@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "dependencies": {
     "chokidar": "1.4.3",
-    "kronos-step": "5.0.0"
+    "kronos-step": "5.0.1"
   },
   "devDependencies": {
     "chai": "3.5.0",
