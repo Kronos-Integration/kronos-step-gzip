@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 /* jslint node: true, esnext: true */
 
-"use strict";
+'use strict';
 
 const chai = require('chai');
 const assert = chai.assert;
@@ -32,7 +32,6 @@ const managerPromise = serviceManager.manager().then(manager =>
 	]).then(() =>
 		Promise.resolve(manager)
 	));
-
 
 
 describe('zip and unzip files', function () {
@@ -66,8 +65,8 @@ describe('zip and unzip files', function () {
 			let errors = [];
 
 			let step1 = manager.createStepInstanceFromConfig({
-				"type": "kronos-step-gzip",
-				"name": "myGzipStep"
+				type: "kronos-step-gzip",
+				name: "myGzipStep"
 			}, manager);
 
 
@@ -118,8 +117,8 @@ describe('zip and unzip files', function () {
 			sendEndpoint.connected = inEndPoint;
 
 			let msg = {
-				"info": {
-					"file_name": "anyFile.txt"
+				info: {
+					file_name: "anyFile.txt"
 				}
 			};
 			msg.payload = fs.createReadStream(inFile);
@@ -181,7 +180,7 @@ describe('zip and unzip files', function () {
 
 						// Is it a directory?
 						if (stats.isFile()) {
-							setTimeout(comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
+							setTimeout(() => comperator.compare(outFile, outFileRef, "sha1", (copied, err) => {
 								assert.ok(copied, "The created unziped file is not the same as expected");
 								resolve("OK");
 							}), 1000);
@@ -192,17 +191,15 @@ describe('zip and unzip files', function () {
 						}
 					});
 				});
-
 			};
-
 
 			receiveEndpoint.receive = receiveFunction;
 			outEndPoint.connected = receiveEndpoint;
 			sendEndpoint.connected = inEndPoint;
 
 			let msg = {
-				"info": {
-					"file_name": "anyFile.txt"
+				info: {
+					file_name: "anyFile.txt"
 				}
 			};
 			msg.payload = fs.createReadStream(inFile);
