@@ -9,7 +9,7 @@ const expect = chai.expect;
 const should = chai.should();
 
 const fs = require('fs');
-const path = require("path");
+const path = require('path');
 const rimraf = require('rimraf');
 
 const fixturesDir = path.join(__dirname, 'fixtures');
@@ -65,8 +65,8 @@ describe('zip and unzip files', function () {
 			let errors = [];
 
 			let step1 = manager.createStepInstanceFromConfig({
-				type: "kronos-step-gzip",
-				name: "myGzipStep"
+				type: 'kronos-step-gzip',
+				name: 'myGzipStep'
 			}, manager);
 
 
@@ -75,11 +75,11 @@ describe('zip and unzip files', function () {
 
 			// This endpoint is the IN endpoint of the next step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let receiveEndpoint = new endpoint.ReceiveEndpoint("testEndpointIn");
+			let receiveEndpoint = new endpoint.ReceiveEndpoint('testEndpointIn');
 
 			// This endpoint is the OUT endpoint of the previous step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let sendEndpoint = new endpoint.SendEndpoint("testEndpointOut");
+			let sendEndpoint = new endpoint.SendEndpoint('testEndpointOut');
 
 
 			// This generator emulates the IN endpoint of the next step.
@@ -98,13 +98,13 @@ describe('zip and unzip files', function () {
 
 						// Is it a file?
 						if (stats.isFile()) {
-							comperator.compare(outFile, outFileRef, "sha1", function (copied, err) {
-								assert.ok(copied, "The created zip file is not the same as expected");
-								resolve("OK");
+							comperator.compare(outFile, outFileRef, 'sha1', function (copied, err) {
+								assert.ok(copied, 'The created zip file is not the same as expected');
+								resolve('OK');
 							});
 						} else {
-							assert.ok(false, "The file does not exists");
-							reject("Error");
+							assert.ok(false, 'The file does not exists');
+							reject('Error');
 						}
 					});
 				});
@@ -118,7 +118,7 @@ describe('zip and unzip files', function () {
 
 			let msg = {
 				info: {
-					file_name: "anyFile.txt"
+					file_name: 'anyFile.txt'
 				}
 			};
 			msg.payload = fs.createReadStream(inFile);
@@ -148,8 +148,8 @@ describe('zip and unzip files', function () {
 			let errors = [];
 
 			let step1 = manager.createStepInstanceFromConfig({
-				"type": "kronos-step-gzip",
-				"name": "myStep"
+				type: 'kronos-step-gzip',
+				name: 'myStep'
 			}, manager);
 
 			let inEndPoint = step1.endpoints.inUnZip;
@@ -157,11 +157,11 @@ describe('zip and unzip files', function () {
 
 			// This endpoint is the IN endpoint of the next step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let receiveEndpoint = new endpoint.ReceiveEndpoint("testEndpointIn");
+			let receiveEndpoint = new endpoint.ReceiveEndpoint('testEndpointIn');
 
 			// This endpoint is the OUT endpoint of the previous step.
 			// It will be connected with the OUT endpoint of the Adpater
-			let sendEndpoint = new endpoint.SendEndpoint("testEndpointOut");
+			let sendEndpoint = new endpoint.SendEndpoint('testEndpointOut');
 
 
 			// This generator emulates the IN endpoint of the next step.
@@ -180,14 +180,14 @@ describe('zip and unzip files', function () {
 
 						// Is it a directory?
 						if (stats.isFile()) {
-							setTimeout(() => comperator.compare(outFile, outFileRef, "sha1", (copied, err) => {
-								assert.ok(copied, "The created unziped file is not the same as expected");
-								resolve("OK");
+							setTimeout(() => comperator.compare(outFile, outFileRef, 'sha1', (copied, err) => {
+								assert.ok(copied, 'The created unziped file is not the same as expected');
+								resolve('OK');
 							}), 1000);
 
 						} else {
-							assert.ok(false, "The file does not exists");
-							reject("Error");
+							assert.ok(false, 'The file does not exists');
+							reject('Error');
 						}
 					});
 				});
@@ -199,7 +199,7 @@ describe('zip and unzip files', function () {
 
 			let msg = {
 				info: {
-					file_name: "anyFile.txt"
+					file_name: 'anyFile.txt'
 				}
 			};
 			msg.payload = fs.createReadStream(inFile);
