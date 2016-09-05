@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "dependencies": {
-    "kronos-endpoint": "^2.13.1",
+    "kronos-endpoint": "^2.13.2",
     "kronos-step": "5.3.4"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "file-compare": "0.0.2",
     "istanbul": "0.4.5",
     "jsdoc": "3.4.0",
-    "kronos-service-manager": "^3.4.15",
+    "kronos-service-manager": "^3.4.16",
     "kronos-test-step": "3.1.4",
     "mocha": "3.0.2",
     "rimraf": "2.5.4",
