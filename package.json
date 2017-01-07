@@ -27,7 +27,7 @@
     "file-compare": "0.0.2",
     "istanbul": "0.4.5",
     "jsdoc": "3.4.2",
-    "kronos-service-manager": "^3.5.5",
+    "kronos-service-manager": "^3.5.6",
     "kronos-test-step": "3.1.4",
     "mocha": "3.2.0",
     "rimraf": "2.5.4",
