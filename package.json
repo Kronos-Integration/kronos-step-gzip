@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "dependencies": {
-    "kronos-endpoint": "^2.14.9",
+    "kronos-endpoint": "^2.14.10",
     "kronos-step": "5.3.7"
   },
   "devDependencies": {
