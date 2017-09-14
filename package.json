@@ -47,7 +47,9 @@
   "engines": {
     "node": ">=8.5.0"
   },
-  "keywords": ["kronos-step"],
+  "keywords": [
+    "kronos-step"
+  ],
   "xo": {
     "space": true
   },
