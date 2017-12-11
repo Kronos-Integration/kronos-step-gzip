@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "dependencies": {
     "kronos-endpoint": "^2.14.10",
-    "kronos-step": "5.5.0"
+    "kronos-step": "5.5.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",
