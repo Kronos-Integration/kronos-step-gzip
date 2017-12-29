@@ -1,22 +1,28 @@
 {
   "name": "kronos-step-gzip",
   "version": "0.0.0-semantic-release",
-  "description": "",
   "main": "index.js",
+  "description": "",
+  "keywords": [
+    "kronos-step"
+  ],
+  "contributors": [
+    {
+      "name": "Torsten Link",
+      "email": "torstenlink@gmx.de"
+    },
+    {
+      "name": "Markus Felten",
+      "email": "markus.felten@gmx.de"
+    }
+  ],
+  "license": "BSD-2-Clause",
   "scripts": {
     "cover": "./node_modules/istanbul/lib/cli.js cover --hook-run-in-context ./node_modules/mocha/bin/_mocha -- --R spec --U exports tests/*-test.js",
     "doc": "./node_modules/.bin/jsdoc lib/*.js",
     "test": "./node_modules/.bin/mocha tests/*-test.js",
     "semantic-release": "semantic-release"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Kronos-Integration/kronos-step-gzip.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Kronos-Integration/kronos-step-gzip/issues"
-  },
-  "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "dependencies": {
     "kronos-endpoint": "^2.14.14",
     "kronos-step": "5.6.4"
@@ -29,27 +35,21 @@
     "jsdoc": "3.5.5",
     "kronos-service-manager": "^3.5.10",
     "kronos-test-step": "3.1.4",
-    "mocha": "^3.5.3",
+    "mocha": "^4.1.0",
     "rimraf": "2.6.2",
-    "semantic-release": "^10.0.1"
+    "semantic-release": "^11.1.0"
   },
-  "contributors": [
-    {
-      "name": "Torsten Link",
-      "email": "torstenlink@gmx.de"
-    },
-    {
-      "name": "Markus Felten",
-      "email": "markus.felten@gmx.de"
-    }
-  ],
-  "license": "BSD-2-Clause",
   "engines": {
     "node": ">=8.9.3"
   },
-  "keywords": [
-    "kronos-step"
-  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kronos-Integration/kronos-step-gzip.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kronos-Integration/kronos-step-gzip/issues"
+  },
+  "homepage": "https://github.com/Kronos-Integration/kronos-step-gzip#readme",
   "xo": {
     "space": true
   },
