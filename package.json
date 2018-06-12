@@ -24,7 +24,7 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "kronos-endpoint": "^2.14.16",
+    "kronos-endpoint": "^2.15.0",
     "kronos-step": "5.6.6"
   },
   "devDependencies": {
